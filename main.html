@@ -1,0 +1,55 @@
+<html>
+
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"> </script>
+</head>
+
+<body>
+    <div id="entrenamiento"></div>
+    <div class="card">
+        <h2>Predicción</h2>
+        <h4> y = 2x + 6 </h4>
+
+        <input type="number" id="inputX" placeholder="Ingrese valor de X">
+
+        <button disabled id="predict" onclick="predict()">Predecir</button>
+
+        <div id="result">---</div>
+    </div>
+
+
+    <script>
+        const model = tf.sequential();
+        model.add(tf.layers.dense({ units: 1, inputShape: [1] }));
+
+        model.compile({ loss: "meanSquaredError", optimizer: "sgd" });
+
+        //2x+6
+        const xs = tf.tensor2d([-6, -5, -4, -3, -2, -1, 0, 1, 2], [9, 1]);
+        const ys = tf.tensor2d([-6, -4, -2, 0, 2, 4, 6, 8, 10], [9, 1]);
+
+        (async function () {
+            document.getElementById("entrenamiento").innerHTML = "Entrenando modelo...";
+
+            document.getElementById("predict").disabled = true;
+
+            const history = await model.fit(xs, ys, { epochs: 500 });
+            console.log(history)
+            document.getElementById("entrenamiento").innerHTML = "Modelo entrenado";
+            document.getElementById("predict").disabled = false;
+            await model.evaluate(xs, ys);
+        })();
+
+        function predict() {
+            const x = parseFloat(document.getElementById("inputX").value);
+
+            const prediction = model.predict(tf.tensor2d([x], [1, 1]));
+
+            const y = prediction.dataSync()[0];
+            document.getElementById("result").innerText = `Resultado: ${y.toFixed(3)}`;
+        }
+
+    </script>
+</body>
+
+</html>
