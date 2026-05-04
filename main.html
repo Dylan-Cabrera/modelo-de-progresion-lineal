@@ -33,7 +33,14 @@
 
             document.getElementById("predict").disabled = true;
 
-            const history = await model.fit(xs, ys, { epochs: 500 });
+            const history = await model.fit(xs, ys, {
+                epochs: 500,
+                callbacks: {
+                    onEpochEnd: (epoch, logs) => {
+                        console.log(`Epoch ${epoch}: loss = ${logs.loss}`);
+                    }
+                }
+            });
             console.log(history)
             document.getElementById("entrenamiento").innerHTML = "Modelo entrenado";
             document.getElementById("predict").disabled = false;
